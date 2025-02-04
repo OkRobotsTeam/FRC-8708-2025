@@ -1,6 +1,6 @@
 package frc.robot.subsystems;
 
-import com.kauailabs.navx.frc.AHRS;
+import com.studica.frc.AHRS;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -42,8 +42,7 @@ public class SwerveDrivetrain extends SubsystemBase {
             CANIds.BACK_LEFT_ROTATION_MOTOR, CANIds.BACK_LEFT_ROTATION_ENCODER, "BL");
     private final SwerveModule backRight = new SwerveModule(CANIds.BACK_RIGHT_DRIVE_MOTOR,
             CANIds.BACK_RIGHT_ROTATION_MOTOR, CANIds.BACK_RIGHT_ROTATION_ENCODER, "BR");
-    // private final AHRS gyro = new AHRS(I2C.Port.kMXP);
-    private final AHRS gyro = new AHRS();
+    private final AHRS gyro = new AHRS(AHRS.NavXComType.kMXP_SPI);
 
     public final SwerveDriveKinematics kinematics = new SwerveDriveKinematics(frontLeftLocation, frontRightLocation,
             backLeftLocation, backRightLocation);
@@ -58,7 +57,6 @@ public class SwerveDrivetrain extends SubsystemBase {
     private final SlewRateLimiter rotateLimiter = new SlewRateLimiter(
             TURNING_MAX_ANGULAR_ACCELERATION_IN_RADIANS_PER_SECOND_SQUARED);
 
-    private Shooter shooter;
     private BetterPoseEstimator poseEstimator;
     public boolean fieldOriented = true;
     private boolean autoAdjustLastTick = false;
