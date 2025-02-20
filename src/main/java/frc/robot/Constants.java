@@ -1,7 +1,7 @@
 package frc.robot;
 
-import com.pathplanner.lib.config.PIDConstants;
-
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.wpilibj.Encoder;
 
 
 public class Constants {
@@ -43,7 +43,8 @@ public class Constants {
 
 
 
-        public static class CANIds {
+
+        public static class Ports {
             public static final int BACK_LEFT_DRIVE_MOTOR = 11;
             public static final int BACK_LEFT_ROTATION_MOTOR = 21;
             public static final int BACK_LEFT_ROTATION_ENCODER = 31;
@@ -62,6 +63,55 @@ public class Constants {
         }
     }
 
+    public static class Elevator {
+        public static class States {
+            public static final int STATE1 = 0;
+            public static final int STATE2 = 1;
+            public static final int STATE3 = 5;
+            public static final int STATE4 = 10;
+            public static final int STATE5 = 20;
+        }
 
-   
+        public static final TrapezoidProfile.Constraints ELEVATOR_TRAPEZOID_PROFILE = new TrapezoidProfile.Constraints(1.0, 1.0);
+
+        public static final double KP = 1;
+        public static final double KI = 0;
+        public static final double KD = 0;
+        public static final boolean ENCODER_REVERSED = false;
+        public static final Encoder.EncodingType ENCODER_ENCODING_TYPE = Encoder.EncodingType.k4X;
+        public static final double MANUAL_ADJUST_STEP = 0.5;
+
+        public static class Ports {
+            public static final int MOTOR_1 = 0;
+            public static final int MOTOR_2 = 0;
+            public static final int ENCODER_CHANNEL_A = 0;
+            public static final int ENCODER_CHANNEL_B = 0;
+
+        }
+
+    }
+
+    public static class Pickup {
+        public static boolean MOTOR_1_INVERTED = false;
+        public static boolean MOTOR_2_INVERTED = true;
+
+        public static int CURRENT_LIMIT_STALLED = 10;
+        public static int CURRENT_LIMIT_FREE = 15;
+
+        public static double INTAKE_IN_SPEED = 1;
+        public static double INTAKE_OUT_SPEED = -1;
+
+        public static double RAISED_SETPOINT = 30;
+        public static double LOWERED_SETPOINT = 0;
+
+        public static final int KP = 1;
+        public static final int KI = 0;
+        public static final int KD = 0;
+
+        public static class Ports {
+            public static final int INTAKE_MOTOR_1 = 0;
+            public static final int INTAKE_MOTOR_2 = 0;
+            public static final int ROTATION_MOTOR = 0;
+        }
+    }
 }

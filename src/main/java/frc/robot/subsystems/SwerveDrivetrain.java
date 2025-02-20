@@ -14,10 +14,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import frc.robot.Constants.SwerveDrivetrain.CANIds;
+import frc.robot.Constants.SwerveDrivetrain.Ports;
 import frc.robot.Debug;
-
-import com.pathplanner.lib.auto.AutoBuilder;
 
 import java.util.Optional;
 
@@ -29,19 +27,17 @@ import static frc.robot.MathUtils.cubicFilter;
  */
 public class SwerveDrivetrain extends SubsystemBase {
     private final Translation2d frontLeftLocation = new Translation2d(WHEELBASE_IN_METERS / 2, WHEELBASE_IN_METERS / 2);
-    private final Translation2d frontRightLocation = new Translation2d(WHEELBASE_IN_METERS / 2,
-            -WHEELBASE_IN_METERS / 2);
+    private final Translation2d frontRightLocation = new Translation2d(WHEELBASE_IN_METERS / 2, -WHEELBASE_IN_METERS / 2);
     private final Translation2d backLeftLocation = new Translation2d(-WHEELBASE_IN_METERS / 2, WHEELBASE_IN_METERS / 2);
-    private final Translation2d backRightLocation = new Translation2d(-WHEELBASE_IN_METERS / 2,
-            -WHEELBASE_IN_METERS / 2);
-    public final SwerveModule frontLeft = new SwerveModule(CANIds.FRONT_LEFT_DRIVE_MOTOR,
-            CANIds.FRONT_LEFT_ROTATION_MOTOR, CANIds.FRONT_LEFT_ROTATION_ENCODER, "FL");
-    private final SwerveModule frontRight = new SwerveModule(CANIds.FRONT_RIGHT_DRIVE_MOTOR,
-            CANIds.FRONT_RIGHT_ROTATION_MOTOR, CANIds.FRONT_RIGHT_ROTATION_ENCODER, "FR");
-    private final SwerveModule backLeft = new SwerveModule(CANIds.BACK_LEFT_DRIVE_MOTOR,
-            CANIds.BACK_LEFT_ROTATION_MOTOR, CANIds.BACK_LEFT_ROTATION_ENCODER, "BL");
-    private final SwerveModule backRight = new SwerveModule(CANIds.BACK_RIGHT_DRIVE_MOTOR,
-            CANIds.BACK_RIGHT_ROTATION_MOTOR, CANIds.BACK_RIGHT_ROTATION_ENCODER, "BR");
+    private final Translation2d backRightLocation = new Translation2d(-WHEELBASE_IN_METERS / 2, -WHEELBASE_IN_METERS / 2);
+    public final SwerveModule frontLeft = new SwerveModule(Ports.FRONT_LEFT_DRIVE_MOTOR,
+            Ports.FRONT_LEFT_ROTATION_MOTOR, Ports.FRONT_LEFT_ROTATION_ENCODER, "FL");
+    private final SwerveModule frontRight = new SwerveModule(Ports.FRONT_RIGHT_DRIVE_MOTOR,
+            Ports.FRONT_RIGHT_ROTATION_MOTOR, Ports.FRONT_RIGHT_ROTATION_ENCODER, "FR");
+    private final SwerveModule backLeft = new SwerveModule(Ports.BACK_LEFT_DRIVE_MOTOR,
+            Ports.BACK_LEFT_ROTATION_MOTOR, Ports.BACK_LEFT_ROTATION_ENCODER, "BL");
+    private final SwerveModule backRight = new SwerveModule(Ports.BACK_RIGHT_DRIVE_MOTOR,
+            Ports.BACK_RIGHT_ROTATION_MOTOR, Ports.BACK_RIGHT_ROTATION_ENCODER, "BR");
     private final AHRS gyro = new AHRS(AHRS.NavXComType.kMXP_SPI);
 
     public final SwerveDriveKinematics kinematics = new SwerveDriveKinematics(frontLeftLocation, frontRightLocation,
