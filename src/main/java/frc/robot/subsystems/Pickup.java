@@ -49,6 +49,10 @@ public class Pickup extends SubsystemBase {
         rotationPID.setSetpoint(RAISED_SETPOINT);
     }
 
+    public void movePickupToPosition(double position) {
+        rotationPID.setSetpoint(position);
+    }
+
     public void runIntakeIn() {
         setIntakeMotors(INTAKE_IN_SPEED);
     }

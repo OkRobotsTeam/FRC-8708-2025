@@ -84,8 +84,8 @@ public class Constants {
         public static class Ports {
             public static final int MOTOR_1 = 0;
             public static final int MOTOR_2 = 0;
-            public static final int ENCODER_CHANNEL_A = 0;
-            public static final int ENCODER_CHANNEL_B = 0;
+            public static final int ENCODER_CHANNEL_A = 1;
+            public static final int ENCODER_CHANNEL_B = 2;
 
         }
 
