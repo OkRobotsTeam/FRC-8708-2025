@@ -8,6 +8,8 @@ import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
+import java.util.function.BooleanSupplier;
+
 import static frc.robot.Constants.Pickup.*;
 
 
@@ -15,7 +17,7 @@ public class Pickup extends SubsystemBase {
     private final SparkMax intakeMotor1 = new SparkMax(Ports.INTAKE_MOTOR_1, SparkLowLevel.MotorType.kBrushless);
     private final SparkMax intakeMotor2 = new SparkMax(Ports.INTAKE_MOTOR_2, SparkLowLevel.MotorType.kBrushless);
     private final TalonFX rotationMotor = new TalonFX(Ports.ROTATION_MOTOR);
-    private final PIDController rotationPID = new PIDController(KP, KI, KD);
+    public final PIDController rotationPID = new PIDController(KP, KI, KD);
     private SparkMaxConfig intakeMotor1Config = new SparkMaxConfig();
     private SparkMaxConfig intakeMotor2Config = new SparkMaxConfig();
 
@@ -33,7 +35,7 @@ public class Pickup extends SubsystemBase {
     public Pickup() {
         rotationPID.reset();
         intakeMotor1Config.inverted(MOTOR_1_INVERTED);
-        intakeMotor2Config.inverted(MOTOR_1_INVERTED);
+        intakeMotor2Config.inverted(MOTOR_2_INVERTED);
         intakeMotor1Config.smartCurrentLimit(CURRENT_LIMIT_STALLED, CURRENT_LIMIT_FREE);
         intakeMotor2Config.smartCurrentLimit(CURRENT_LIMIT_STALLED, CURRENT_LIMIT_FREE);
         intakeMotor1.configure(intakeMotor1Config, SparkBase.ResetMode.kNoResetSafeParameters, SparkBase.PersistMode.kPersistParameters);
@@ -43,6 +45,7 @@ public class Pickup extends SubsystemBase {
 
     public void lowerPickup() {
         rotationPID.setSetpoint(LOWERED_SETPOINT);
+
     }
 
     public void raisePickup() {
@@ -68,5 +71,15 @@ public class Pickup extends SubsystemBase {
     public void setIntakeMotors(double power) {
         intakeMotor1.set(power);
         intakeMotor2.set(power);
+    }
+
+    public BooleanSupplier isNotExtended() {
+        BooleanSupplier myBooleanSupplier = new BooleanSupplier() {
+            @Override
+            public boolean getAsBoolean() {
+                return (rotationPID.getSetpoint() != RAISED_SETPOINT);
+            }
+        };
+        return myBooleanSupplier;
     }
 }

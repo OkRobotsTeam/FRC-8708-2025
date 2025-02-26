@@ -49,6 +49,18 @@ public class Elevator extends SubsystemBase {
         setMotors(0.0);
     }
 
+    public void nextState() {
+        if (currentState < 5) {
+            transitionToState(currentState + 1);
+        }
+    }
+
+    public void previousState() {
+        if (currentState > 1) {
+            transitionToState(currentState - 1);
+        }
+    }
+
     public void setMotors(double power) {
         motor1.set(power);
         motor2.set(power);

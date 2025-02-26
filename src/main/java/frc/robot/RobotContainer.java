@@ -10,6 +10,7 @@ import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import edu.wpi.first.networktables.BooleanEntry;
 import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
@@ -21,7 +22,12 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 
+import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.subsystems.*;
+
+import java.util.function.BooleanSupplier;
+
+import static frc.robot.Constants.Pickup.RAISED_SETPOINT;
 
 
 public class RobotContainer {
@@ -29,12 +35,16 @@ public class RobotContainer {
     private final CommandXboxController driveController = new CommandXboxController(0);
     private final CommandXboxController manipulatorController = new CommandXboxController(1);
 
-    // Subsystems
+//    private GenericHID operator2;
+//    private final JoystickButton test = new JoystickButton(operator2, 1);
+//    private final JoystickButton test2 = new JoystickButton(operator2, GenericHID.HIDType.kHIDGamepad.value);
 
-  
-    
     private final BetterPoseEstimator poseEstimator = new BetterPoseEstimator();
     private final SwerveDrivetrain swerveDrivetrain = new SwerveDrivetrain(poseEstimator);
+    private final Pickup pickup = new Pickup();
+    private final Elevator elevator = new Elevator();
+    private final Climber climber = new Climber();
+    private final Delivery delivery  = new Delivery();
 
 
     // Shuffleboard
@@ -152,18 +162,30 @@ public class RobotContainer {
 
         driveController.rightBumper().onTrue(Commands.runOnce(swerveDrivetrain::toggleFieldOriented));
 
-    }
+        manipulatorController.rightTrigger().onTrue(Commands.runOnce(pickup::runIntakeIn));
+        manipulatorController.leftTrigger().onTrue(Commands.runOnce(pickup::runIntakeOut));
+        manipulatorController.rightTrigger().onFalse(Commands.runOnce(pickup::stopIntake));
+        manipulatorController.leftTrigger().onFalse(Commands.runOnce(pickup::stopIntake));
 
-      private void configureControllerBindingsTeddy() {
-        swerveDrivetrain.setDefaultCommand(getSwerveDriveCommand());
+        manipulatorController.rightTrigger().and(() -> (pickup.rotationPID.getSetpoint() != RAISED_SETPOINT)).onTrue(
+                Commands.runOnce(pickup::runIntakeIn).andThen(Commands.runOnce(delivery::runDeliveryOut)));
 
-        driveController.a().onTrue(
-                Commands.runOnce(swerveDrivetrain::resetGyro).andThen(
-                Commands.runOnce(swerveDrivetrain::resetOdometry)
-                )
-        );
+        manipulatorController.leftTrigger().onTrue(Commands.runOnce(pickup::runIntakeOut));
+        manipulatorController.rightTrigger().onFalse(Commands.runOnce(pickup::stopIntake));
+        manipulatorController.leftTrigger().onFalse(Commands.runOnce(pickup::stopIntake));
 
-        driveController.rightBumper().onTrue(Commands.runOnce(swerveDrivetrain::toggleFieldOriented));
+        manipulatorController.povUp().onTrue(Commands.runOnce(elevator::nextState));
+        manipulatorController.povDown().onTrue(Commands.runOnce(elevator::previousState));
+
+        manipulatorController.b().onTrue(Commands.runOnce(pickup::lowerPickup));
+        manipulatorController.b().onFalse(Commands.runOnce(pickup::raisePickup));
+
+        manipulatorController.a().onTrue(Commands.runOnce(delivery::runDeliveryOut));
+        manipulatorController.a().onFalse(Commands.runOnce(delivery::stopDelivery));
+
+        manipulatorController.x().onTrue(Commands.runOnce(delivery::runDeliveryIn));
+        manipulatorController.x().onFalse(Commands.runOnce(delivery::stopDelivery));
+
 
     }
 

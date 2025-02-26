@@ -114,4 +114,26 @@ public class Constants {
             public static final int ROTATION_MOTOR = 0;
         }
     }
+
+    public static class Delivery {
+        public static final boolean DELIVERY_MOTOR_INVERTED = false;
+        public static int CURRENT_LIMIT_STALLED = 10;
+        public static int CURRENT_LIMIT_FREE = 15;
+        public static final int DELIVERY_OUT_SPEED = 1;
+        public static final int DELIVERY_IN_SPEED = 1;
+        public static class Ports {
+            public static final int DELIVERY_MOTOR = 0;
+        }
+    }
+
+    public static final class Climber {
+        public static final double KP = 1;
+        public static final double KI = 0;
+        public static final double KD = 0;
+        public static final double CLIMBING_SETPOINT = 0;
+        public static final double DOCKING_SETPOINT = 0;
+        public static class Ports {
+            public static final int CLIMBER_MOTOR = 0;
+        }
+    }
 }
