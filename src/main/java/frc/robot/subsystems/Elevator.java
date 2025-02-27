@@ -22,7 +22,7 @@ public class Elevator extends SubsystemBase {
         encoder.reset();
         // Configures the encoder to return a distance of 1 for every 8192 pulses (one revolution of the REV Through-bore)
         // Also changes the units of getRate
-        encoder.setDistancePerPulse(1.0/8192.0);
+//        encoder.setDistancePerPulse(1.0/8192.0);
         elevatorPID.reset(getElevatorPosition());
         transitionToState(currentState);
     }
@@ -74,5 +74,9 @@ public class Elevator extends SubsystemBase {
     public void setManualAdjustIn() {
         manualAdjustAmount -= MANUAL_ADJUST_STEP;
         transitionToState(currentState);
+    }
+
+    public void debug() {
+        System.out.println("Encoder Distance (ticks): " + encoder.getDistance());
     }
 }
