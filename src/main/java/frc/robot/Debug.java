@@ -53,4 +53,30 @@ public class Debug {
         map.put(key, i);
         
     }
+
+    public static void println(Object... args) {
+        StringBuilder output = new StringBuilder();
+        for (Object o : args) {
+            if (o instanceof java.lang.String ) {
+                output.append(o);
+            }
+            if (o instanceof Double) {
+                output.append(twoPlaces((Double) o));
+            }
+            if (o instanceof Integer) {
+                output.append((Integer) o);
+            }
+            if (o instanceof Boolean) {
+                output.append((Boolean) o);
+            }
+        }
+        System.out.println(output);
+    }
+
+    public static String fmt(String label, double value) {
+        return label + ": " + twoPlaces(value);
+    }
+
+
+
 }

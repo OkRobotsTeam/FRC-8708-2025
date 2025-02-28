@@ -32,7 +32,11 @@ public class Robot extends TimedRobot {
     }
     @Override
     public void disabledPeriodic() {
-        robotContainer.periodic();
+        try {
+            robotContainer.periodic();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
      }
 
     @Override
@@ -46,8 +50,12 @@ public class Robot extends TimedRobot {
 
     @Override
     public void teleopPeriodic() {
-        robotContainer.periodic();
-        robotContainer.teleopPeriodic();
+        try {
+            robotContainer.periodic();
+            robotContainer.teleopPeriodic();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -62,22 +70,20 @@ public class Robot extends TimedRobot {
 
     @Override
     public void autonomousPeriodic() {
-        robotContainer.periodic();
-    }
-
-
-
-    @Override
-    public void testInit() {
-        // Cancels the autonomous task when teleop starts
-        if (autonomousCommand != null) {
-            autonomousCommand.cancel();
+        try {
+            robotContainer.periodic();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-        robotContainer.testInit();
     }
+
 
     @Override
     public void testPeriodic() {
-        robotContainer.periodic();
+        try {
+            robotContainer.periodic();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

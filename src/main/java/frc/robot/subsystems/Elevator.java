@@ -4,6 +4,7 @@ import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Debug;
 
 
 import static frc.robot.Constants.Elevator.*;
@@ -13,8 +14,9 @@ public class Elevator extends SubsystemBase {
     private final PWMSparkMax motor1 = new PWMSparkMax(Ports.MOTOR_1);
     private final PWMSparkMax motor2 = new PWMSparkMax(Ports.MOTOR_2);
     Encoder encoder = new Encoder(Ports.ENCODER_CHANNEL_A, Ports.ENCODER_CHANNEL_B, ENCODER_REVERSED, ENCODER_ENCODING_TYPE);
+
     private final ProfiledPIDController elevatorPID = new ProfiledPIDController(KP, KI, KD, ELEVATOR_TRAPEZOID_PROFILE);
-    private double currentState = States.STATE1;
+    private int currentState = 0;
     private double manualAdjustAmount = 0.0;
 
     public Elevator() {
@@ -22,7 +24,7 @@ public class Elevator extends SubsystemBase {
         encoder.reset();
         // Configures the encoder to return a distance of 1 for every 8192 pulses (one revolution of the REV Through-bore)
         // Also changes the units of getRate
-//        encoder.setDistancePerPulse(1.0/8192.0);
+        encoder.setDistancePerPulse(20.0/2462.0);
         elevatorPID.reset(getElevatorPosition());
         transitionToState(currentState);
     }
@@ -34,15 +36,20 @@ public class Elevator extends SubsystemBase {
     @Override
     public void periodic() {
         double pidOutput = elevatorPID.calculate(getElevatorPosition());
-        setMotors(pidOutput);
+        setMotors(pidOutput + KG);
     }
 
     public double getElevatorPosition() {
         return encoder.getDistance();
     }
 
-    public void transitionToState(double state) {
-        elevatorPID.setGoal(state + manualAdjustAmount);
+    public void transitionToState(int state) {
+        try {
+            elevatorPID.setGoal(States[state] + manualAdjustAmount);
+            currentState = state;
+        } catch (Exception e) {
+            System.out.println("Error setting elevator to state: " + e);
+        }
     }
 
     public void stop() {
@@ -50,13 +57,13 @@ public class Elevator extends SubsystemBase {
     }
 
     public void nextState() {
-        if (currentState < 5) {
+        if (currentState < States.length - 1) {
             transitionToState(currentState + 1);
         }
     }
 
     public void previousState() {
-        if (currentState > 1) {
+        if (currentState > 0) {
             transitionToState(currentState - 1);
         }
     }
@@ -71,12 +78,12 @@ public class Elevator extends SubsystemBase {
         transitionToState(currentState);
     }
 
-    public void setManualAdjustIn() {
+    public void ManualAdjustIn() {
         manualAdjustAmount -= MANUAL_ADJUST_STEP;
         transitionToState(currentState);
     }
 
     public void debug() {
-        System.out.println("Encoder Distance (ticks): " + encoder.getDistance());
+        Debug.println("Encoder Distance: ", encoder.getDistance(), "  P Error: ", elevatorPID.getPositionError(), "  I Error: ", elevatorPID.getAccumulatedError(), "  Motor Power", motor1.get());
     }
 }

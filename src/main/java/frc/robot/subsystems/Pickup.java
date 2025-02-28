@@ -6,6 +6,7 @@ import com.revrobotics.spark.SparkLowLevel;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import java.util.function.BooleanSupplier;
@@ -18,8 +19,6 @@ public class Pickup extends SubsystemBase {
     private final SparkMax intakeMotor2 = new SparkMax(Ports.INTAKE_MOTOR_2, SparkLowLevel.MotorType.kBrushless);
     private final TalonFX rotationMotor = new TalonFX(Ports.ROTATION_MOTOR);
     public final PIDController rotationPID = new PIDController(KP, KI, KD);
-    private SparkMaxConfig intakeMotor1Config = new SparkMaxConfig();
-    private SparkMaxConfig intakeMotor2Config = new SparkMaxConfig();
 
 
     /**
@@ -34,7 +33,9 @@ public class Pickup extends SubsystemBase {
     
     public Pickup() {
         rotationPID.reset();
+        SparkMaxConfig intakeMotor1Config = new SparkMaxConfig();
         intakeMotor1Config.inverted(MOTOR_1_INVERTED);
+        SparkMaxConfig intakeMotor2Config = new SparkMaxConfig();
         intakeMotor2Config.inverted(MOTOR_2_INVERTED);
         intakeMotor1Config.smartCurrentLimit(CURRENT_LIMIT_STALLED, CURRENT_LIMIT_FREE);
         intakeMotor2Config.smartCurrentLimit(CURRENT_LIMIT_STALLED, CURRENT_LIMIT_FREE);
@@ -74,12 +75,16 @@ public class Pickup extends SubsystemBase {
     }
 
     public BooleanSupplier isNotExtended() {
-        BooleanSupplier myBooleanSupplier = new BooleanSupplier() {
-            @Override
-            public boolean getAsBoolean() {
-                return (rotationPID.getSetpoint() != RAISED_SETPOINT);
-            }
-        };
-        return myBooleanSupplier;
+        return () -> (rotationPID.getSetpoint() != RAISED_SETPOINT);
+    }
+
+    public Command stopIntakeCmd() {
+        return runOnce(() -> {stopIntake();});
+    }
+    public Command runIntakeInCmd() {
+        return runOnce(() -> {runIntakeIn();});
+    }
+    public Command runIntakeOutCmd() {
+        return runOnce(() -> {runIntakeOut();});
     }
 }

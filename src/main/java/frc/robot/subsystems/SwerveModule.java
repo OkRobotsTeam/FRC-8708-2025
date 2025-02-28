@@ -1,11 +1,9 @@
 package frc.robot.subsystems;
 
-import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
-import com.ctre.phoenix6.configs.TalonFXConfiguration;
-import com.ctre.phoenix6.configs.TalonFXConfigurator;
-import com.ctre.phoenix6.configs.TorqueCurrentConfigs;
+import com.ctre.phoenix6.configs.*;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
 
@@ -28,6 +26,10 @@ import static frc.robot.Constants.SwerveDrivetrain.*;
 public class SwerveModule {
     private final TalonFX driveMotor;
     private final TalonFX turningMotor;
+    private final TalonFXConfiguration turningMotorConfig = new TalonFXConfiguration();
+
+
+
     private final CANcoder turningEncoder;
 
     private final PIDController drivePIDController = new PIDController(1, 0, 0);
@@ -51,16 +53,24 @@ public class SwerveModule {
         this.name = name;
 
         driveMotor = new TalonFX(driveMotorCANID);
-        driveMotor.setInverted(DRIVE_MOTORS_INVERTED);
+        var driveConfigurator = driveMotor.getConfigurator();
+        var driveMotorConfigs = new MotorOutputConfigs();
+        driveMotorConfigs.Inverted = DRIVE_MOTORS_INVERTED ? InvertedValue.CounterClockwise_Positive: InvertedValue.Clockwise_Positive;
+        driveConfigurator.apply(driveMotorConfigs);
+
         var currentLimits = new CurrentLimitsConfigs();
 		currentLimits.SupplyCurrentLimit = 35;
-		currentLimits.SupplyCurrentLimitEnable = true; 
+		currentLimits.SupplyCurrentLimitEnable = true;
 		currentLimits.StatorCurrentLimit = 75;
 		currentLimits.StatorCurrentLimitEnable = true;
 		driveMotor.getConfigurator().apply(currentLimits);
 
         turningMotor = new TalonFX(turningMotorCANID);
-        turningMotor.setInverted(TURNING_MOTORS_INVERTED);
+
+        var turnConfigurator = driveMotor.getConfigurator();
+        var turnMotorConfigs = new MotorOutputConfigs();
+        turnMotorConfigs.Inverted = TURNING_MOTORS_INVERTED ? InvertedValue.CounterClockwise_Positive: InvertedValue.Clockwise_Positive;
+        turnConfigurator.apply(turnMotorConfigs);
 
         turningEncoder = new CANcoder(turningEncoderCANID);
 
@@ -169,13 +179,8 @@ public class SwerveModule {
 
 
         turnOutput = turnOutput / 4;
-        //turningMotor.setVoltage(turnOutput);
         turningMotor.set(turnOutput/12);
-        //driveMotor.set( (driveOutput + driveFeedforward) / 12);
         driveMotor.setVoltage( (driveOutput + driveFeedforward) );
-
-        //driveMotor.setVoltage(driveOutput);
-        //System.out.println("Setting turning motor voltage to " + turnOutput);
         
     }
     public void setDriveMotorBraking(boolean braking) {
