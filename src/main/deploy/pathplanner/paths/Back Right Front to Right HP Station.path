@@ -3,25 +3,25 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 2.0,
-        "y": 7.0
+        "x": 4.1,
+        "y": 2.6
       },
       "prevControl": null,
       "nextControl": {
-        "x": 3.0,
-        "y": 7.0
+        "x": 2.7432660077747544,
+        "y": 1.9870537055166144
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 3.0,
-        "y": 7.0
+        "x": 1.2,
+        "y": 1.1
       },
       "prevControl": {
-        "x": 2.0,
-        "y": 7.0
+        "x": 2.8112169140263608,
+        "y": 1.7720791816711428
       },
       "nextControl": null,
       "isLocked": false,
@@ -42,13 +42,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 0.0
+    "rotation": 145.0
   },
   "reversed": false,
-  "folder": "Tests",
+  "folder": "Right Start Two High Coral",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 0.0
+    "rotation": -29.999999999999996
   },
   "useDefaultConstraints": true
 }

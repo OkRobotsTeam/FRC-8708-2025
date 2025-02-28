@@ -104,7 +104,7 @@ public class Constants {
     public static class Delivery {
         public static int CURRENT_LIMIT_STALLED = 10;
         public static int CURRENT_LIMIT_FREE = 15;
-        public static final double DELIVERY_OUT_SPEED = 1;
+        public static final double DELIVERY_OUT_SPEED = -1;
         public static final double DELIVERY_IN_SPEED = 1;
         public static class Ports {
             public static final int DELIVERY_MOTOR_ID = 5;
@@ -112,8 +112,8 @@ public class Constants {
         }
         public static final boolean DELIVERY_MOTOR_INVERTED = false;
         public static boolean CONVEYOR_MOTOR_INVERTED = false;
-        public static final double CONVEYOR_OUT_SPEED = 0.6;
-        public static final double CONVEYOR_IN_SPEED = 0.6;
+        public static final double CONVEYOR_OUT_SPEED = -0.5;
+        public static final double CONVEYOR_IN_SPEED = 0.5;
     }
 
     public static final class Climber {

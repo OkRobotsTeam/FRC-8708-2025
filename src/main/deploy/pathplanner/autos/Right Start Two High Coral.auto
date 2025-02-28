@@ -1,0 +1,67 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Right Start to Back Right Front"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "raiseElevator"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "deliver"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 2.0
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "stopDelivery"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "lowerElevator"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Back Right Front to Right HP Station"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 3.0
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Right HP Station to Back Right Back"
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": true,
+  "folder": null,
+  "choreoAuto": false
+}

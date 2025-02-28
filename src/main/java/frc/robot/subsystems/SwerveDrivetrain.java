@@ -124,7 +124,7 @@ public class SwerveDrivetrain extends SubsystemBase {
         return angleFromRobotToGoal;
     }
 
-    public void driveWithController(XboxController controller, SendableChooser<Double> driveSpeed, SendableChooser<Double> turnSpeed) {
+    public void driveWithController(XboxController controller, SendableChooser<Double> driveSpeed, SendableChooser<Double> turnSpeed, double elevatorHeight) {
         boolean fast = controller.getRightTriggerAxis() > 0.25;
         boolean slow = controller.getLeftTriggerAxis() > 0.25;
         boolean wheelsCrossed = controller.getLeftBumper();
@@ -199,9 +199,11 @@ public class SwerveDrivetrain extends SubsystemBase {
         if (loopCounter%50==25) {
             rotationSpeedScalar = turnSpeed.getSelected();
         }
+
+        double slowdownDueToElevator = 1 - Math.min(elevatorHeight, 30.0) / 32.0;
         
-        xSpeed *= driveSpeedScalar;
-        ySpeed *= driveSpeedScalar;
+        xSpeed *= driveSpeedScalar * slowdownDueToElevator;
+        ySpeed *= driveSpeedScalar * slowdownDueToElevator;
 
         // Apply the rotation speed selector from ShuffleBoard
         rot *= rotationSpeedScalar;
@@ -295,7 +297,6 @@ public class SwerveDrivetrain extends SubsystemBase {
         //         + fmt(swerveModuleStates[0].speedMetersPerSecond));
 
         frontLeft.setDesiredState(swerveModuleStates[0]);
-
         frontRight.setDesiredState(swerveModuleStates[1]);
         backLeft.setDesiredState(swerveModuleStates[2]);
         backRight.setDesiredState(swerveModuleStates[3]);

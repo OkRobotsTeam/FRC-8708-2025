@@ -29,12 +29,7 @@ public class Elevator extends SubsystemBase {
         transitionToState(currentState);
     }
 
-    /**
-     * Updates the field relative position of the robot.
-     * Called automatically by command scheduler
-     */
-    @Override
-    public void periodic() {
+    public void teleopPeriodic() {
         double pidOutput = elevatorPID.calculate(getElevatorPosition());
         setMotors(pidOutput + KG);
     }

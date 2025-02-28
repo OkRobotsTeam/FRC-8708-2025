@@ -3,25 +3,25 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 2.0,
-        "y": 7.0
+        "x": 7.7,
+        "y": 4.0
       },
       "prevControl": null,
       "nextControl": {
-        "x": 3.0,
-        "y": 7.0
+        "x": 6.420144463558237,
+        "y": 4.019230336434044
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 3.0,
-        "y": 7.0
+        "x": 5.9,
+        "y": 4.03
       },
       "prevControl": {
-        "x": 2.0,
-        "y": 7.0
+        "x": 7.097699305885715,
+        "y": 4.008836771312513
       },
       "nextControl": null,
       "isLocked": false,
@@ -42,10 +42,10 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 0.0
+    "rotation": 90.0
   },
   "reversed": false,
-  "folder": "Tests",
+  "folder": "Middle Start One High Coral",
   "idealStartingState": {
     "velocity": 0,
     "rotation": 0.0

@@ -11,6 +11,7 @@ import static frc.robot.Constants.Climber.*;
 public class Climber extends SubsystemBase {
     private final TalonFX climberMotor = new TalonFX(Constants.Climber.Ports.CLIMBER_MOTOR);
     private final PIDController climberPID = new PIDController(KP, KI, KD);
+    public double pidOutput = 0;
 
     public Climber() {
         climberPID.reset();
@@ -22,8 +23,8 @@ public class Climber extends SubsystemBase {
      */
     @Override
     public void periodic() {
-        double pidOutput = climberPID.calculate(climberMotor.getPosition().getValueAsDouble());
-        climberMotor.set(pidOutput);
+        pidOutput = climberPID.calculate(climberMotor.getPosition().getValueAsDouble());
+        //climberMotor.set(pidOutput);
     }
 
 

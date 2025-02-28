@@ -72,6 +72,7 @@ public class Robot extends TimedRobot {
     public void autonomousPeriodic() {
         try {
             robotContainer.periodic();
+            robotContainer.autonomousPeriodic();
         } catch (Exception e) {
             e.printStackTrace();
         }

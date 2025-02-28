@@ -1,9 +1,14 @@
 package frc.robot;
 
+import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
+import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
+import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 
 import edu.wpi.first.networktables.*;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
@@ -13,6 +18,8 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import java.util.function.BooleanSupplier;
+
 
 import frc.robot.subsystems.*;
 import java.util.Objects;
@@ -23,21 +30,20 @@ public class RobotContainer {
     private final CommandXboxController driveController = new CommandXboxController(0);
     private final CommandXboxController manipulatorController = new CommandXboxController(1);
 
-//    private GenericHID operator2;
-//    private final JoystickButton test = new JoystickButton(operator2, 1);
-//    private final JoystickButton test2 = new JoystickButton(operator2, GenericHID.HIDType.kHIDGamepad.value);
-
-//    private final BetterPoseEstimator poseEstimator = new BetterPoseEstimator();
-//    private final SwerveDrivetrain swerveDrivetrain = new SwerveDrivetrain(poseEstimator);
+    private final BetterPoseEstimator poseEstimator = new BetterPoseEstimator();
+    private final SwerveDrivetrain swerveDrivetrain = new SwerveDrivetrain(poseEstimator);
 //    private final Pickup pickup = new Pickup();
     private final Elevator elevator = new Elevator();
-//    private final Climber climber = new Climber();
+    private final Climber climber = new Climber();
     private final Delivery delivery  = new Delivery();
-
 
     // Shuffleboard
     private final SendableChooser<Double> driveSpeed = new SendableChooser<>();
     private final SendableChooser<Double> turnSpeed = new SendableChooser<>();
+    private final SendableChooser<Command> autonomousSelector;
+    ShuffleboardTab drivingTab = Shuffleboard.getTab("Driving");
+    GenericEntry fieldOrientedBooleanBox = drivingTab.add("FieldOriented", true).withPosition(4, 1).withSize(2, 2).getEntry();
+
 
     private final Field2d limelightField = new Field2d();
     private final Field2d odometryField = new Field2d();
@@ -51,7 +57,6 @@ public class RobotContainer {
     private int i = 0;
 
     public RobotContainer() {
-        ShuffleboardTab drivingTab = Shuffleboard.getTab("Driving");
         GenericEntry ShooterAngleEntry = drivingTab.add("Shooter angle", 0).withPosition(0, 0).withSize(2, 1).getEntry();
         RobotConfig config = null;
         try{
@@ -60,31 +65,31 @@ public class RobotContainer {
             // Handle exception as needed
             e.printStackTrace();
         }
-//        AutoBuilder.configure(
-//                swerveDrivetrain::getOdometryPose, // Robot pose supplier
-//                swerveDrivetrain::setOdometryPose, // Method to reset odometry (will be called if your auto has a starting pose)
-//                swerveDrivetrain::getRobotRelativeSpeeds, // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
-////                (speeds, feedforwards) -> swerveDrivetrain.pathPlannerDrive(speeds), // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds
-//                new PPHolonomicDriveController( // PPHolonomicController is the built in path following controller for holonomic drive trains
-//                    new PIDConstants(5.0, 0.0, 0.0), // Translation PID constants
-//                    new PIDConstants(5.0, 0.0, 0.0) // Rotation PID constants
-//                ),config,
-//                () -> {
-//                    // Boolean supplier that controls when the path will be mirrored for the red
-//                    // alliance
-//                    // This will flip the path being followed to the red side of the field.
-//                    // THE ORIGIN WILL REMAIN ON THE BLUE SIDE
-//
-//                    var alliance = DriverStation.getAlliance();
-//                    return alliance.filter(value -> value == DriverStation.Alliance.Red).isPresent();
-//                },
-//                swerveDrivetrain // Reference to this subsystem to set requirements
-//        );
+       AutoBuilder.configure(
+               swerveDrivetrain::getOdometryPose, // Robot pose supplier
+               swerveDrivetrain::setOdometryPose, // Method to reset odometry (will be called if your auto has a starting pose)
+               swerveDrivetrain::getRobotRelativeSpeeds, // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
+                (speeds, feedforwards) -> swerveDrivetrain.pathPlannerDrive(speeds), // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds
+               new PPHolonomicDriveController( // PPHolonomicController is the built in path following controller for holonomic drive trains
+                   new PIDConstants(5.0, 0.0, 0.0), // Translation PID constants
+                   new PIDConstants(5.0, 0.0, 0.0) // Rotation PID constants
+               ), config,   () -> { 
+                var alliance = DriverStation.getAlliance();
+                return alliance.filter(value -> value == DriverStation.Alliance.Red).isPresent();
+                },
+               swerveDrivetrain // Reference to this subsystem to set requirements
+       );
 
        // Register Named Commands
         NamedCommands.registerCommand("extendWrist", new InstantCommand(this::doNothing));
+        NamedCommands.registerCommand("raiseElevator", new InstantCommand(() -> elevator.transitionToState(3)));
+        NamedCommands.registerCommand("lowerElevator", new InstantCommand(() -> elevator.transitionToState(0)));
+        NamedCommands.registerCommand("deliver", new InstantCommand(delivery::runConveyorOut));
+        NamedCommands.registerCommand("stopDelivery", new InstantCommand(delivery::stopDelivery));
 
- //       autonomousSelector = AutoBuilder.buildAutoChooser();
+
+
+        autonomousSelector = AutoBuilder.buildAutoChooser();
         // drivingTab.add( new HttpCamera("limelight",
         //                 NetworkTableInstance.getDefault().getEntry("limelight_Stream").getString("http://limelight.local:5800/stream.mjpg"),
         //                 HttpCamera.HttpCameraKind.kMJPGStreamer))
@@ -95,14 +100,13 @@ public class RobotContainer {
         setupShuffleboard(drivingTab);
 //        swerveDrivetrain.setDefaultCommand(getSwerveDriveCommand());
         configureControllerBindings();
-        // configureControllerBindingsTeddy();
     }
 
     public void doNothing() {
 
     }
 
-    
+
     private void setupShuffleboard(ShuffleboardTab drivingTab) {
 
 
@@ -122,13 +126,9 @@ public class RobotContainer {
         turnSpeed.addOption("10%", 0.1);
 
 
-        //drivingTab.add("Autonomous", autonomousSelector).withPosition(2, 0).withSize(2, 1);
+        drivingTab.add("Autonomous", autonomousSelector).withPosition(2, 0).withSize(2, 1);
         drivingTab.add("Drive Speed", driveSpeed).withPosition(0, 1).withSize(2, 1);
         drivingTab.add("Turning Speed", turnSpeed).withPosition(2, 1).withSize(2, 1);
-
-
-        //private final SendableChooser<Command> autonomousSelector;
-        GenericEntry fieldOrientedBooleanBox = drivingTab.add("FieldOriented", true).withPosition(4, 1).withSize(2, 2).getEntry();
 
         SmartDashboard.putData("Limelight Position", limelightField);
         SmartDashboard.putData("Odometry Position", odometryField);
@@ -139,21 +139,15 @@ public class RobotContainer {
         Shuffleboard.update();
     }
 
-    private void configureControllerBindings() {
-//        swerveDrivetrain.setDefaultCommand(getSwerveDriveCommand());
+    private void configureControllerBindings() {        
+       driveController.a().onTrue(
+               Commands.runOnce(swerveDrivetrain::resetGyro).andThen(
+               Commands.runOnce(swerveDrivetrain::resetOdometry)
+               )
+       );
 
+       driveController.rightBumper().onTrue(Commands.runOnce(swerveDrivetrain::toggleFieldOriented));
 
-        // manipulatorController.rightTrigger().whileTrue(Commands.repeatingSequence(new InstantCommand(() -> shooter.autoAngle(poseEstimator)), new WaitCommand(0.1)));
-        
-        
-//        driveController.a().onTrue(
-//                Commands.runOnce(swerveDrivetrain::resetGyro).andThen(
-//                Commands.runOnce(swerveDrivetrain::resetOdometry)
-//                )
-//        );
-//
-//        driveController.rightBumper().onTrue(Commands.runOnce(swerveDrivetrain::toggleFieldOriented));
-//
 //        manipulatorController.rightTrigger().onTrue(Commands.runOnce(pickup::runIntakeIn));
 //        manipulatorController.leftTrigger().onTrue(Commands.runOnce(pickup::runIntakeOut));
 //        manipulatorController.rightTrigger().onFalse(Commands.runOnce(pickup::stopIntake));
@@ -165,8 +159,6 @@ public class RobotContainer {
 //        manipulatorController.leftTrigger().onTrue(Commands.runOnce(pickup::runIntakeOut));
 //        manipulatorController.rightTrigger().onFalse(Commands.runOnce(pickup::stopIntake));
 //        manipulatorController.leftTrigger().onFalse(Commands.runOnce(pickup::stopIntake));
-
-
 
         manipulatorController.povUp().onTrue(Commands.runOnce(elevator::nextState));
         manipulatorController.povDown().onTrue(Commands.runOnce(elevator::previousState));
@@ -180,7 +172,6 @@ public class RobotContainer {
         manipulatorController.x().onTrue(delivery.runConveyorIn());
         manipulatorController.x().onFalse(delivery.stopConveyorCmd());
 
-
         manipulatorController.b().onTrue(delivery.runDeliveryOut());
         manipulatorController.b().onFalse(delivery.stopDeliveryCmd());
 
@@ -193,8 +184,6 @@ public class RobotContainer {
         manipulatorController.start().onFalse(delivery.stopConveyorCmd());
 
 
-
-
 //        manipulatorController.b().onTrue(Commands.runOnce(pickup::lowerPickup));
 //        manipulatorController.b().onFalse(Commands.runOnce(pickup::raisePickup));
 //
@@ -203,18 +192,15 @@ public class RobotContainer {
 //
 //        manipulatorController.x().onTrue(Commands.runOnce(delivery::runDeliveryIn));
 //        manipulatorController.x().onFalse(Commands.runOnce(delivery::stopDelivery));
-
-
     }
 
-//    public Command getSwerveDriveCommand() {
-//        XboxController controller = driveController.getHID();
-////        return new InstantCommand(() -> swerveDrivetrain.driveWithController(controller, driveSpeed, turnSpeed), swerveDrivetrain);
-//    }
+   public Command getSwerveDriveCommand() {
+       XboxController controller = driveController.getHID();
+       return new InstantCommand(() -> swerveDrivetrain.driveWithController(controller, driveSpeed, turnSpeed, elevator.getElevatorPosition()), swerveDrivetrain);
+   }
 
     public Command getAutonomousCommand() {
-        //return autonomousSelector.getSelected();
-        return null;
+        return autonomousSelector.getSelected();
     }
 
     public void sleep(double millis) {
@@ -226,9 +212,8 @@ public class RobotContainer {
     }
 
     public void robotInit() {
-//        swerveDrivetrain.stop();
-//        swerveDrivetrain.resetGyro();
-
+       swerveDrivetrain.stop();
+       swerveDrivetrain.resetGyro();
     }
 
     public void teleopInit() {
@@ -239,8 +224,8 @@ public class RobotContainer {
         System.out.println("==================Starting teleop======================");
         System.out.println("=======================================================");
 
-//        swerveDrivetrain.init();
-//        swerveDrivetrain.setDefaultCommand(getSwerveDriveCommand());
+       swerveDrivetrain.init();
+       swerveDrivetrain.setDefaultCommand(getSwerveDriveCommand());
 
 //        climber.recalibrateClimber();
 
@@ -251,55 +236,36 @@ public class RobotContainer {
         System.out.println("=======================================================");
         System.out.println("================Starting Autonomous====================");
         System.out.println("=======================================================");
-//        swerveDrivetrain.setDefaultCommand(getSwerveDriveCommand());
-
-
+        swerveDrivetrain.setDefaultCommand(new InstantCommand(() -> swerveDrivetrain.stop(), swerveDrivetrain));
     }
 
 
     public void periodic() {
-        String key = manipulatorButtons.getKey();
-        if (!Objects.equals(key, "")) {
-            if (Objects.equals(key, "a")) {
-                System.out.println("Transitioning to state 0");
-                elevator.transitionToState(0);
-            }else if (Objects.equals(key, "b")) {
-                System.out.println("Transitioning to state 1");
-                elevator.transitionToState(1);
-            } else if (Objects.equals(key, "c")) {
-                System.out.println("Transitioning to state 2");
-                elevator.transitionToState(2);
-            }else if (Objects.equals(key, "d")) {
-                System.out.println("Transitioning to state 3");
-                elevator.transitionToState(3);
-            }else if (Objects.equals(key, "e")) {
-                System.out.println("Transitioning to state 4");
-                elevator.transitionToState(4);
-            }
-            System.out.println(key);
-        }
+       odometryField.setRobotPose(swerveDrivetrain.getOdometryPose());
+       poseEstimatorField.setRobotPose(poseEstimator.getCurrentPose());
+       anchorField.setRobotPose(poseEstimator.getAnchor());
+       fieldOrientedBooleanBox.setBoolean(swerveDrivetrain.fieldOriented);
+    }
 
-        i++;
-        if (i % 20 == 0) {
-            elevator.debug();
-
-        }
-//        odometryField.setRobotPose(swerveDrivetrain.getOdometryPose());
-//        poseEstimatorField.setRobotPose(poseEstimator.getCurrentPose());
-//        anchorField.setRobotPose(poseEstimator.getAnchor());
-//        fieldOrientedBooleanBox.setBoolean(swerveDrivetrain.fieldOriented);
+    public void autonomousPeriodic() {
+        elevator.teleopPeriodic();
     }
 
     public void teleopPeriodic() {
-
+        elevator.teleopPeriodic();
+        manipulatorButtons.checkButtons(elevator);
+        i++;
+        if (i % 20 == 0) {
+            elevator.debug();
+        }
     }
 
     public void enable() {
-
+        elevator.transitionToState(0);
     }
 
     public void disable() {
-
+        elevator.transitionToState(0);
 //        swerveDrivetrain.stop();
     }
 }

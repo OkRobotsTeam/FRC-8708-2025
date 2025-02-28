@@ -7,13 +7,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Move Forward"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "Move Right and Turn -90"
+            "pathName": "Test"
           }
         }
       ]
