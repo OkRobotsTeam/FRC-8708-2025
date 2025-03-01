@@ -2,10 +2,13 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.wpilibj.Encoder;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Debug;
 
+
+import java.sql.Time;
 
 import static frc.robot.Constants.Elevator.*;
 
@@ -66,6 +69,10 @@ public class Elevator extends SubsystemBase {
     public void setMotors(double power) {
         motor1.set(power);
         motor2.set(power);
+    }
+
+    public void manualAdjust(double amount) {
+        manualAdjustAmount = manualAdjustAmount + amount * 0.02;
     }
 
     public void manualAdjustOut() {
