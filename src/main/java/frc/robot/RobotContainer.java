@@ -6,6 +6,7 @@ import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 
+import edu.wpi.first.cscore.HttpCamera;
 import edu.wpi.first.networktables.*;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.XboxController;
@@ -18,11 +19,9 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import java.util.function.BooleanSupplier;
 
 
 import frc.robot.subsystems.*;
-import java.util.Objects;
 
 
 public class RobotContainer {
@@ -129,6 +128,12 @@ public class RobotContainer {
         drivingTab.add("Autonomous", autonomousSelector).withPosition(2, 0).withSize(2, 1);
         drivingTab.add("Drive Speed", driveSpeed).withPosition(0, 1).withSize(2, 1);
         drivingTab.add("Turning Speed", turnSpeed).withPosition(2, 1).withSize(2, 1);
+
+        drivingTab.add( new HttpCamera("Left Camera",
+                         "http://photonvision.local:1189/stream.mjpg",
+                         HttpCamera.HttpCameraKind.kMJPGStreamer))
+                 .withPosition(6,1)
+                 .withSize(4,2);
 
         SmartDashboard.putData("Limelight Position", limelightField);
         SmartDashboard.putData("Odometry Position", odometryField);
