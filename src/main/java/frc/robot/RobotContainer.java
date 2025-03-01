@@ -168,25 +168,38 @@ public class RobotContainer {
         manipulatorController.povUp().onTrue(Commands.runOnce(elevator::nextState));
         manipulatorController.povDown().onTrue(Commands.runOnce(elevator::previousState));
 
-        manipulatorController.leftBumper().onTrue(Commands.runOnce(elevator::ManualAdjustIn));
-        manipulatorController.rightBumper().onTrue(Commands.runOnce(elevator::manualAdjustOut));
+        manipulatorController.y().onTrue(Commands.runOnce(() -> climber.setSpeed(1.0)));
+        manipulatorController.y().onFalse(Commands.runOnce(() -> climber.setSpeed(0.0)));
 
-        manipulatorController.a().onTrue(delivery.runConveyorOut());
-        manipulatorController.a().onFalse(delivery.stopConveyorCmd());
+        manipulatorController.a().onTrue(Commands.runOnce(() -> climber.setSpeed(-1.0)));
+        manipulatorController.a().onFalse(Commands.runOnce(() -> climber.setSpeed(0.0)));
 
-        manipulatorController.x().onTrue(delivery.runConveyorIn());
-        manipulatorController.x().onFalse(delivery.stopConveyorCmd());
+//        manipulatorController.leftBumper().onTrue(Commands.runOnce(elevator::ManualAdjustIn));
+//        manipulatorController.rightBumper().onTrue(Commands.runOnce(elevator::manualAdjustOut));
 
-        manipulatorController.b().onTrue(delivery.runDeliveryOut());
-        manipulatorController.b().onFalse(delivery.stopDeliveryCmd());
 
-        manipulatorController.y().onTrue(delivery.runDeliveryIn());
-        manipulatorController.y().onFalse(delivery.stopDeliveryCmd());
 
-        manipulatorController.start().onTrue(delivery.runConveyorOut());
-        manipulatorController.start().onTrue(delivery.runDeliveryOut());
-        manipulatorController.start().onFalse(delivery.stopDeliveryCmd());
-        manipulatorController.start().onFalse(delivery.stopConveyorCmd());
+//        manipulatorController.a().onTrue(delivery.runConveyorOut());
+//        manipulatorController.a().onFalse(delivery.stopConveyorCmd());
+//
+//        manipulatorController.x().onTrue(delivery.runConveyorIn());
+//        manipulatorController.x().onFalse(delivery.stopConveyorCmd());
+//
+//        manipulatorController.b().onTrue(delivery.runDeliveryOut());
+//        manipulatorController.b().onFalse(delivery.stopDeliveryCmd());
+//
+//        manipulatorController.y().onTrue(delivery.runDeliveryIn());
+//        manipulatorController.y().onFalse(delivery.stopDeliveryCmd());
+
+        manipulatorController.rightTrigger().onTrue(delivery.runConveyorOut());
+        manipulatorController.rightTrigger().onTrue(delivery.runDeliveryOut());
+        manipulatorController.rightTrigger().onFalse(delivery.stopDeliveryCmd());
+        manipulatorController.rightTrigger().onFalse(delivery.stopConveyorCmd());
+
+        manipulatorController.leftTrigger().onTrue(delivery.runConveyorIn());
+        manipulatorController.leftTrigger().onTrue(delivery.runDeliveryIn());
+        manipulatorController.leftTrigger().onFalse(delivery.stopDeliveryCmd());
+        manipulatorController.leftTrigger().onFalse(delivery.stopConveyorCmd());
 
 
 //        manipulatorController.b().onTrue(Commands.runOnce(pickup::lowerPickup));
@@ -258,6 +271,7 @@ public class RobotContainer {
 
     public void teleopPeriodic() {
         elevator.teleopPeriodic();
+        elevator.manualAdjust(manipulatorController.getLeftY());
         manipulatorButtons.checkButtons(elevator);
         i++;
         if (i % 20 == 0) {

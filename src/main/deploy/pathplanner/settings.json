@@ -8,7 +8,9 @@
     "Right Start Two High Coral",
     "Tests"
   ],
-  "autoFolders": [],
+  "autoFolders": [
+    "Tests"
+  ],
   "defaultMaxVel": 1.0,
   "defaultMaxAccel": 0.2,
   "defaultMaxAngVel": 90.0,
