@@ -2,13 +2,11 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.wpilibj.Encoder;
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Debug;
+import frc.robot.MathUtils;
 
-
-import java.sql.Time;
 
 import static frc.robot.Constants.Elevator.*;
 
@@ -19,8 +17,9 @@ public class Elevator extends SubsystemBase {
     Encoder encoder = new Encoder(Ports.ENCODER_CHANNEL_A, Ports.ENCODER_CHANNEL_B, ENCODER_REVERSED, ENCODER_ENCODING_TYPE);
 
     private final ProfiledPIDController elevatorPID = new ProfiledPIDController(KP, KI, KD, ELEVATOR_TRAPEZOID_PROFILE);
-    private int currentState = 0;
+    public int currentState = 0;
     private double manualAdjustAmount = 0.0;
+    private double lastTime = 0;
 
     public Elevator() {
         stop();
@@ -43,10 +42,20 @@ public class Elevator extends SubsystemBase {
 
     public void transitionToState(int state) {
         try {
-            elevatorPID.setGoal(States[state] + manualAdjustAmount);
+            manualAdjustAmount = 0;
             currentState = state;
+            System.out.println("Moving To State: " + currentState);
+            updateManualAdjust();
         } catch (Exception e) {
             System.out.println("Error setting elevator to state: " + e);
+        }
+    }
+
+    public void updateManualAdjust() {
+        try {
+            elevatorPID.setGoal(MathUtils.clamp(States[currentState] + manualAdjustAmount, 0, 65));
+        } catch (Exception e) {
+            System.out.println("Current State out of range: " + e);
         }
     }
 
@@ -71,21 +80,37 @@ public class Elevator extends SubsystemBase {
         motor2.set(power);
     }
 
+    double getTime() {
+        return System.currentTimeMillis() / 1000.0;
+    }
+
     public void manualAdjust(double amount) {
-        manualAdjustAmount = manualAdjustAmount + amount * 0.02;
+        double currentTime = getTime();
+        double deltaTime =  currentTime - lastTime;
+        lastTime = currentTime;
+        manualAdjustAmount = manualAdjustAmount - amount * deltaTime;
+        updateManualAdjust();
     }
 
     public void manualAdjustOut() {
         manualAdjustAmount += MANUAL_ADJUST_STEP;
-        transitionToState(currentState);
+        updateManualAdjust();
     }
 
     public void ManualAdjustIn() {
         manualAdjustAmount -= MANUAL_ADJUST_STEP;
-        transitionToState(currentState);
+        updateManualAdjust();
     }
 
     public void debug() {
         Debug.println("Encoder Distance: ", encoder.getDistance(), "  P Error: ", elevatorPID.getPositionError(), "  I Error: ", elevatorPID.getAccumulatedError(), "  Motor Power", motor1.get());
+    }
+
+    public void toggleHigh() {
+        if (currentState == 4) {
+            transitionToState(0);
+        } else {
+            transitionToState(4);
+        }
     }
 }

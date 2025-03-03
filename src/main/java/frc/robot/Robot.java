@@ -15,7 +15,7 @@ public class Robot extends TimedRobot {
     public void robotInit() {
 
         robotContainer = new RobotContainer();
-        robotContainer.robotInit();        
+        robotContainer.robotInit();
     }
 
     // This function is called every 20 ms, no matter the mode.
@@ -45,6 +45,7 @@ public class Robot extends TimedRobot {
         if (autonomousCommand != null) {
             autonomousCommand.cancel();
         }
+        robotContainer.enable();
         robotContainer.teleopInit();
     }
 
@@ -60,6 +61,7 @@ public class Robot extends TimedRobot {
 
     @Override
     public void autonomousInit() {
+        robotContainer.enable();
         robotContainer.autonomousInit();
         autonomousCommand = robotContainer.getAutonomousCommand();
         // if a valid command was received, schedule it
@@ -77,7 +79,6 @@ public class Robot extends TimedRobot {
             e.printStackTrace();
         }
     }
-
 
     @Override
     public void testPeriodic() {

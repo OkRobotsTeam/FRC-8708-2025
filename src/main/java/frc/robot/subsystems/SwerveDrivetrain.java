@@ -12,6 +12,7 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants.SwerveDrivetrain.Ports;
@@ -19,6 +20,7 @@ import frc.robot.Debug;
 
 import java.util.Optional;
 
+import static frc.robot.Constants.Delivery.DELIVERY_OUT_SPEED;
 import static frc.robot.Constants.SwerveDrivetrain.*;
 import static frc.robot.MathUtils.cubicFilter;
 
@@ -127,9 +129,9 @@ public class SwerveDrivetrain extends SubsystemBase {
     public void driveWithController(XboxController controller, SendableChooser<Double> driveSpeed, SendableChooser<Double> turnSpeed, double elevatorHeight) {
         boolean fast = controller.getRightTriggerAxis() > 0.25;
         boolean slow = controller.getLeftTriggerAxis() > 0.25;
-        boolean wheelsCrossed = controller.getLeftBumper();
+        boolean wheelsCrossed = controller.getLeftBumperButton();
         boolean straightenWheels = (controller.getPOV() == 0);
-        boolean autoAdjust = controller.getRightTriggerAxis() > 0.25;
+//        boolean autoAdjust = controller.getRightTriggerAxis() > 0.25;
 
         // debugPrint("Gyro: " + gyro.getAngle() + ":" + gyro.getYaw());
 
@@ -160,35 +162,35 @@ public class SwerveDrivetrain extends SubsystemBase {
         // the right by default.
         double rot = -rightStickXWithRateLimit * TURNING_MAX_ANGULAR_VELOCITY_IN_RADIANS_PER_SECOND;
         
-        if (autoAdjust) {
-            Rotation2d targetRotation = getGoalAngle(poseEstimator);
-            Pose2d currentPose = poseEstimator.getRobotPose();
-            Rotation2d currentRotation = currentPose.getRotation();
-
-            Optional<DriverStation.Alliance> ally = DriverStation.getAlliance();
-
-            Rotation2d rotation = Rotation2d.fromDegrees(0);
-
-
-            if (ally.isPresent()) {
-                rotation = currentRotation;
-                Rotation2d difference = targetRotation.minus(rotation);
-
-                rot = difference.getDegrees() * 0.13;
-
-                rot = MathUtil.clamp(rot, -4, 4);
-
-                Debug.debugPrint("Target: " + fmt(targetRotation.getDegrees()) + 
-                    " Current: " + fmt(rotation.getDegrees()) + 
-                    " Difference (deg): " + fmt(difference.getDegrees()) + 
-                    " Difference (rot): " + fmt(difference.getRotations()) + 
-                    " Output: " + fmt(rot));
-
-            } else {
-                System.out.println("Warning: No alliance Selected, please select alliance");
-            }
-
-        }
+//        if (autoAdjust) {
+//            Rotation2d targetRotation = getGoalAngle(poseEstimator);
+//            Pose2d currentPose = poseEstimator.getRobotPose();
+//            Rotation2d currentRotation = currentPose.getRotation();
+//
+//            Optional<DriverStation.Alliance> ally = DriverStation.getAlliance();
+//
+//            Rotation2d rotation = Rotation2d.fromDegrees(0);
+//
+//
+//            if (ally.isPresent()) {
+//                rotation = currentRotation;
+//                Rotation2d difference = targetRotation.minus(rotation);
+//
+//                rot = difference.getDegrees() * 0.13;
+//
+//                rot = MathUtil.clamp(rot, -4, 4);
+//
+//                Debug.debugPrint("Target: " + fmt(targetRotation.getDegrees()) +
+//                    " Current: " + fmt(rotation.getDegrees()) +
+//                    " Difference (deg): " + fmt(difference.getDegrees()) +
+//                    " Difference (rot): " + fmt(difference.getRotations()) +
+//                    " Output: " + fmt(rot));
+//
+//            } else {
+//                System.out.println("Warning: No alliance Selected, please select alliance");
+//            }
+//
+//        }
 
         // Apply the drive speed selector from ShuffleBoard
         
@@ -206,7 +208,7 @@ public class SwerveDrivetrain extends SubsystemBase {
         ySpeed *= driveSpeedScalar * slowdownDueToElevator;
 
         // Apply the rotation speed selector from ShuffleBoard
-        rot *= rotationSpeedScalar;
+        rot *= rotationSpeedScalar * slowdownDueToElevator;
 
         if (slow) {
             // Slow down movements if the slow flag is true
@@ -348,7 +350,10 @@ public class SwerveDrivetrain extends SubsystemBase {
         return odometry.getPoseMeters();
     }
 
+
     public Rotation2d getGyroAngle() {
         return gyro.getRotation2d();
     }
+
+
 }

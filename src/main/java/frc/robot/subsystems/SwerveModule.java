@@ -158,24 +158,24 @@ public class SwerveModule {
         double turnFF = turnFeedforward.calculate(optimizedDesiredState.angle.minus(getRotation()).getRadians());
         double turnOutput = turningPIDController.calculate(getRotation().getRadians(), optimizedDesiredState.angle.getRadians());
 
-        if (name == "FL") {
-            // if (optimizedDesiredState.speedMetersPerSecond > 0) {
-            //     Debug.debugPrint(name, " FF:" + fmt(driveFeedforward) + " + DO:" + fmt(driveOutput) + " CS:"
-            //             + fmt(getVelocityMetersPerSecond()) + " DS:" + fmt(optimizedDesiredState.speedMetersPerSecond) +
-            //             " Ratio: " + fmt(getVelocityMetersPerSecond() / optimizedDesiredState.speedMetersPerSecond));
-            // }
-
-            // //Debug.debugPrint("Voltage",
-            // fmt(driveMotor.getMotorVoltage().getValueAsDouble()));
-            // //Debug.debugPrint("RPS", fmt(driveMotor.getVelocity().getValueAsDouble()));
-            
-            // System.out.println("Turning" 
-            //         + " diff: " + fmt(optimizedDesiredState.angle.minus(getRotation()).getDegrees())
-            //         + " PID: " + fmt(turnOutput)
-            //         + " FF: " + fmt(turnFF));
-            
-
-        }
+//        if (name == "FL") {
+//             if (optimizedDesiredState.speedMetersPerSecond > 0) {
+//                 Debug.debugPrint(name, " FF:" + fmt(driveFeedforward) + " + DO:" + fmt(driveOutput) + " CS:"
+//                         + fmt(getVelocityMetersPerSecond()) + " DS:" + fmt(optimizedDesiredState.speedMetersPerSecond) +
+//                         " Ratio: " + fmt(getVelocityMetersPerSecond() / optimizedDesiredState.speedMetersPerSecond));
+//             }
+//
+//             //Debug.debugPrint("Voltage",
+//             fmt(driveMotor.getMotorVoltage().getValueAsDouble());
+//             //Debug.debugPrint("RPS", fmt(driveMotor.getVelocity().getValueAsDouble()));
+//
+//             System.out.println("Turning"
+//                     + " diff: " + fmt(optimizedDesiredState.angle.minus(getRotation()).getDegrees())
+//                     + " PID: " + fmt(turnOutput)
+//                     + " FF: " + fmt(turnFF));
+//
+//
+//        }
 
 
         turnOutput = turnOutput / 4;
